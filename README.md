@@ -14,3 +14,8 @@ Donc, le chiffrement XOR est considéré comme un algorithme de chiffrement faib
 Parce que il ne faut pas mélanger le sel et la clé directement car ça les rend vulnérables à des attaques informatiques. Le sel est utilisé pour rendre plus difficile la recherche de la clé originale. En ajoutant le sel avant de hasher, on augmente la sécurité en rendant plus difficile la recherche de la clé.
 
 Et utiliser un HMAC est une bonne idée pour renforcer la sécurité des clés. Cela crée un code secret pour chaque message qui assure que la clé n'a pas été modifiée. Mais il est important d'utiliser un sel pour renforcer la sécurité de la clé.
+
+
+## Question 3 :
+
+Avant d'écrire dans le fichier "token.bin", il faut vérifier s'il est déjà présent. Cela évite d'effacer des informations importantes qui y étaient stockées auparavant. Si le fichier existe déjà, il est possible qu'en l'écrasant, les données soient perdues. Pour éviter cela, il suffit d'utiliser une fonction qui vérifie si le fichier existe déjà et ainsi éviter d'écraser accidentellement des informations. Il est alors possible de signaler une erreur ou de demander confirmation avant d'effacer le fichier existant.

